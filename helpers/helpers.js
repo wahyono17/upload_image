@@ -1,36 +1,32 @@
 const util = require('util')
 const gc = require('../config/')
-const bucket = gc.bucket('jsimage')//bucket name
+const bucket = gc.bucket('jsimage')//bucket name di google drive
+const path = require('path')
+const fs = require("fs")//untuk remove picture yang telah di uplaod
 
 const { format } = util
 
-/**
- *
- * @param { File } object file object that will be uploaded
- * @description - This function does the following
- * - It uploads a file to the image bucket on Google Cloud
- * - It accepts an object as an argument with the
- *   "originalname" and "buffer" as keys
- */
-
+//promise dibuat langsung di jalankan, karena itu tidak perlu then untuk resolve dan catch untuk error
 const uploadImage = (file) => new Promise((resolve, reject) => {
-  const { originalname, buffer } = file
+  //console.log(file);
+  const {filename} = file;
+  const picture = path.join(__dirname,'../uploads/',filename);
 
-  const blob = bucket.file(originalname.replace(/ /g, "_"))
-  const blobStream = blob.createWriteStream({
-    resumable: false
-  })
+  //ini peruntah untuk uplaod
+  bucket.upload(picture);
 
-  blobStream.on('finish', () => {
-    const publicUrl = format(
-      `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-    )
-    resolve(publicUrl)
-  })
-  .on('error', () => {
-    reject(`Unable to upload image, something went wrong`)
-  })
-  .end(buffer)
+  //ini yang di kirim ke return
+  const publicUrl = format(
+    `https://storage.googleapis.com/${bucket.name}/${filename}`
+  )
+
+
+  //ini untuk remove picture di nodejs, setelah di upload
+  //fs.unlinkSync(picture)
+
+  resolve(publicUrl)
+
+  reject(err=>(err))
 
 })
 
