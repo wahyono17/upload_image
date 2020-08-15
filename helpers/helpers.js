@@ -2,7 +2,6 @@ const util = require('util')
 const gc = require('../config/')
 const bucket = gc.bucket('jsimage')//bucket name di google drive
 const path = require('path')
-const fs = require("fs")//untuk remove picture yang telah di uplaod
 
 const { format } = util
 
